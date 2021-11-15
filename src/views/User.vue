@@ -1345,6 +1345,7 @@ export default {
         Followings,
       } = dummyData.profile;
       this.profile = {
+        ...this.profile,
         id,
         name,
         email,
