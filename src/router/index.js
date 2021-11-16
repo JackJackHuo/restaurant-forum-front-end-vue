@@ -67,6 +67,17 @@ const routes = [
     component: () => import('../views/AdminRestaurants.vue')
   },
   {
+    path: '/admin/restaurants/new',
+    name: 'admin-restaurant-new',
+    component: () => import('../views/AdminRestaurantNew.vue')
+  },
+  // param路由:id要放在後面，否則會攔截前面/admin/restaurants/..路由
+  {
+    path: '/admin/restaurants/:id/edit',
+    name: 'admin-restaurant-edit',
+    component: () => import('../views/AdminRestaurantEdit')
+  },
+  {
     path: '/admin/restaurants/:id',
     name: 'admin-restaurant',
     component: () => import('../views/AdminRestaurant.vue')

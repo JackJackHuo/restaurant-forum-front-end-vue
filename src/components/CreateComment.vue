@@ -44,9 +44,9 @@ export default {
     },
     methods: {
       handleSubmit () {
+        // TODO: 向 API 發送 POST 請求
+        // 伺服器新增 Comment 成功後...
         this.$emit('after-create-comment' , {
-          // TODO: 向 API 發送 POST 請求
-          // 伺服器新增 Comment 成功後...
           commentId: uuidv4(), // 尚未串接 API 暫時使用隨機的 id
           text: this.text,
           restaurantId: this.restaurantId
