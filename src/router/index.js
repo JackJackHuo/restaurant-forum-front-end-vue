@@ -93,6 +93,11 @@ const routes = [
     component: () => import('../views/AdminCategories.vue')
   },
   {
+    path:'/admin/users',
+    name: 'admin-users',
+    component: () => import('./../views/AdminUsers')
+  },
+  {
     path: '/:pathMatch(.*)*',
     name: 'not-found',
     component: NotFound
