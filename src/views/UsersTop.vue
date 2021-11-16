@@ -11,11 +11,13 @@
         :key="user.id"
         class="col-3"
       >
-        <a href="#">
+        <router-link 
+          :to="{ name: 'user' , params: { id: user.id }}"
+        >
           <img
             :src="user.image"
           >
-        </a>
+        </router-link>
         <h2>{{user.name}}</h2>
         <span class="badge badge-secondary">追蹤人數：{{user.FollowerCount}}</span>
         <p class="mt-3">

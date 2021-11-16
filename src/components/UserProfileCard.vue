@@ -43,6 +43,13 @@
             >追蹤</button>
           </form>
           <p></p>
+          <router-link
+            v-if="profile.isAdmin"
+            :to="{ name: 'user-edit' , params: { id: profile.id}}"
+            class="btn btn-secondary"
+          >
+            編輯
+          </router-link>
         </div>
       </div>
     </div>
