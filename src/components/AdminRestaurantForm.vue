@@ -198,6 +198,7 @@ export default {
       if (files.length === 0) {
         this.restaurant.image = "";
       } else {
+        // window.URL.createObjectURL()為你的本機檔案來產生一個暫存的 URL，這並不是一個真正的網址，但是可以讓我們存取到本機圖片，並且暫時將圖片呈現在畫面上。
         const imgUrl = window.URL.createObjectURL(files[0]);
         this.restaurant.image = imgUrl;
       }

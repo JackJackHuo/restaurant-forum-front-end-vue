@@ -42,6 +42,7 @@
       <button
         class="btn btn-lg btn-primary btn-block mb-3"
         type="submit"
+        :disabled="isProcessing"
       >
         Submit
       </button>
@@ -62,20 +63,57 @@
 </template>
 
 <script>
+// export default，所以import時名字自取
+import authorizationAPI from './../apis/authorization'
+// Toast 不是 export default，所以import時要使用{ export時的命名 }或是{ export時的命名 as import時重新命名 }
+import { Toast } from './../utils/helper'
+
 export default {
   data(){
     return {
       email: "",
       password: "",
+      isProcessing: false
     }
   },
   methods:{
     handleSubmit(){
-      const data = JSON.stringify({
+      // 如果 email 或 password 為空，則使用 Toast 提示
+      // 然後 return 不繼續往後執行
+      if(!this.email || !this.password){
+        Toast.fire({
+          icon: 'warning',
+          title: '請填入 email 和 password'
+        })
+        return
+      }
+      this.isProcessing = true
+      // 利用axios透過API向後端發送登入request
+      authorizationAPI.signin({
         email: this.email,
-        password: this.password
+        password: this.password,
+      }).then( response => {
+        // 取得 API 請求後的資料
+        const { data } = response
+        // 檢查後端server的response message並拋出error
+        if( data.status !== 'success'){
+          throw new Error(data.message)
+        }
+        // 將 token 存放在 localStorage 內
+        localStorage.setItem('token', data.token)
+        // 成功登入後轉址到餐廳首頁
+        this.$router.push('/restaurants')
+      }).catch( error => {
+        this.isProcessing = false
+        // 將密碼欄位清空
+        this.password = ''
+        // 顯示錯誤提示
+        Toast.fire({
+          icon: 'warning',
+          title: '請確認您輸入了正確的帳號密碼'
+        })
+        console.log(error)
       })
-      console.log("data" , data)
     }
   }
 }

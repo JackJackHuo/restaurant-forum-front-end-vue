@@ -100,7 +100,7 @@ export default {
     }
   },
   methods: {
-    handleSubmit (e) {
+    handleSubmit () {
       const data = JSON.stringify({
         name: this.name,
         email: this.email,
