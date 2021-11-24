@@ -1,4 +1,4 @@
-import { apiHelper } from '../utils/helper'
+import { apiHelper } from '../utils/helpers'
 
 export default {
   // 帶入需要的參數

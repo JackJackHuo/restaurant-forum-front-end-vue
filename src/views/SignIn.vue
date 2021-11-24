@@ -66,7 +66,7 @@
 // export default，所以import時名字自取
 import authorizationAPI from './../apis/authorization'
 // Toast 不是 export default，所以import時要使用{ export時的命名 }或是{ export時的命名 as import時重新命名 }
-import { Toast } from './../utils/helper'
+import { Toast } from '../utils/helpers'
 
 export default {
   data(){
