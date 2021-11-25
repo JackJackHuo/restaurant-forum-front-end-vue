@@ -22,7 +22,7 @@
           v-if="restaurant.isFavorited"
           type="button"
           class="btn btn-danger btn-border favorite mr-2"
-          @click.stop.prevent="deleteFavorite"
+          @click.stop.prevent="deleteFavorite(restaurant.id)"
         >
           移除最愛
         </button>
@@ -30,7 +30,7 @@
           v-else
           type="button"
           class="btn btn-primary btn-border favorite mr-2"
-          @click.stop.prevent="addFavorite"
+          @click.stop.prevent="addFavorite(restaurant.id)"
         >
           加到最愛
         </button>
@@ -38,7 +38,7 @@
           v-if="restaurant.isLiked"
           type="button"
           class="btn btn-danger like mr-2"
-          @click.stop.prevent="deleteLike"
+          @click.stop.prevent="deleteLike(restaurant.id)"
         >
           Unlike
         </button>
@@ -46,7 +46,7 @@
           v-else
           type="button"
           class="btn btn-primary like mr-2"
-          @click.stop.prevent="addLike"
+          @click.stop.prevent="addLike(restaurant.id)"
         >
           Like
         </button>
@@ -56,6 +56,9 @@
 </template>
 
 <script>
+import userAPI from './../apis/user'
+import { Toast } from './../utils/helpers'
+
 export default {
   name: 'RestaurantCard',
   props: {
@@ -70,30 +73,94 @@ export default {
     }
   },
   methods: {
-    addFavorite() {
-      this.restaurant = {
-        ...this.restaurant,
-        isFavorited: true
-      }
+    async addFavorite(restaurantId) {
+      try{
+        const { data } = await userAPI.addFavorite(restaurantId)
+        if (data.status !== 'success') {
+          throw new Error(data.message)
+        }
+        this.restaurant = {
+          ...this.restaurant,
+          isFavorited: true
+        }
+        Toast.fire({
+          icon: 'success',
+          title: '成功將餐廳加入最愛清單'
+        })
+      }catch(error){
+        Toast.fire({
+          icon: 'error',
+          title: '無法將餐廳加入最愛清單，請稍後再試'
+        })
+        console.log('error', error)
+      }   
     },
-    deleteFavorite() {
-      this.restaurant = {
-        ...this.restaurant,
-        isFavorited: false
-      }
+    async deleteFavorite(restaurantId) {
+      try{
+        const { data } = await userAPI.deleteFavorite(restaurantId)
+        if (data.status !== 'success') {
+          throw new Error(data.message)
+        }
+        this.restaurant = {
+          ...this.restaurant,
+          isFavorited: false
+        }
+        Toast.fire({
+          icon: 'success',
+          title: '成功將餐廳移除最愛清單'
+        })
+      }catch(error){
+        Toast.fire({
+          icon: 'error',
+          title: '無法將餐廳移除最愛清單，請稍後再試'
+        })
+        console.log('error', error)
+      }   
     },
-    addLike () {
-      this.restaurant = {
-        ...this.restaurant,
-        isLiked: true
-      }
+    async addLike (restaurantId) {
+      try{
+        const { data } = await userAPI.addLike(restaurantId)
+        if (data.status !== 'success') {
+          throw new Error(data.message)
+        }
+        this.restaurant = {
+          ...this.restaurant,
+          isLiked: true
+        }
+        Toast.fire({
+          icon: 'success',
+          title: String.fromCodePoint(0x1F49E).repeat(10)
+        })
+      }catch(error){
+        Toast.fire({
+          icon: 'error',
+          title: '無法將餐廳按讚，請稍後再試'
+        })
+        console.log('error', error)
+      }   
     },
-    deleteLike () {
-      this.restaurant = {
-        ...this.restaurant,
-        isLiked: false
-      }
-    }
+    async deleteLike (restaurantId) {
+      try{
+        const { data } = await userAPI.deleteLike(restaurantId)
+        if (data.status !== 'success') {
+          throw new Error(data.message)
+        }
+        this.restaurant = {
+          ...this.restaurant,
+          isLiked: false
+        }
+        Toast.fire({
+          icon: 'success',
+          title: String.fromCodePoint(0x1F494).repeat(10)
+        })
+      }catch(error){
+        Toast.fire({
+          icon: 'error',
+          title: '無法將餐廳取消按讚，請稍後再試'
+        })
+        console.log('error', error)
+      }   
+    },
   }
 }
 </script>
