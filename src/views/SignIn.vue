@@ -106,7 +106,7 @@ export default {
         // 成功登入後轉址到餐廳首頁
         this.$router.push('/restaurants')
       }catch(error){
-         this.isProcessing = false
+        this.isProcessing = false
         // 將密碼欄位清空
         this.password = ''
         // 顯示錯誤提示
