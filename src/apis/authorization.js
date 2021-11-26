@@ -9,4 +9,9 @@ export default {
       password
     })
   },
+  signup(data) {
+    return apiHelper.post('/signup', {
+      ...data
+    })
+  }
 }

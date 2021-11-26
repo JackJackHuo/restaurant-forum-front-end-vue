@@ -90,6 +90,9 @@
 </template>
 
 <script>
+import authorizationAPI from './../apis/authorization'
+import { Toast } from './../utils/helpers'
+
 export default {
   data () {
     return {
@@ -100,16 +103,28 @@ export default {
     }
   },
   methods: {
-    handleSubmit () {
-      const data = JSON.stringify({
-        name: this.name,
-        email: this.email,
-        password: this.password,
-        passwordCheck: this.passwordCheck
-      })
-
-      // TODO: 向後端驗證使用者登入資訊是否合法
-      console.log('data', data)
+    async handleSubmit () {
+      try{
+        const signupData = {
+          name: this.name,
+          email: this.email,
+          password: this.password,
+          passwordCheck: this.passwordCheck
+        }
+  
+        // TODO: 向後端驗證使用者登入資訊是否合法
+        const { data } = await authorizationAPI.signup(signupData)
+        if(data.status !== 'success') throw new Error(data.message)
+        Toast.fire({
+          icon: 'success',
+          title: '成功註冊!'
+        })
+      }catch(error) {
+        Toast.fire({
+          icon: 'error',
+          title: '無法註冊，請稍後再試'
+        })
+      }
     }
   }
 }
