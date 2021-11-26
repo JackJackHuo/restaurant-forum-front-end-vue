@@ -63,7 +63,7 @@ export default {
   },
   // 使用 beforeRouteUpdate 方法取得使用者路由變化
   beforeRouteUpdate(to , from , next){
-      //網址如果page或categoryId沒有值， to.query取出來的值為undefined，而且是String，導致向後端query 'undefined'內容，所以透過解構賦值可以透過 = 給變數預設值''。 
+      //網址如果page或categoryId沒有值， to.query取出來的值為undefined，而且是String，導致向後端query String為'undefined'的篩選條件內容，所以透過解構賦值可以透過 = 給變數預設值''(''等於全選)。 
       const { page = '' , categoryId = '' } = to.query
       this.fetchRestaurants({
         queryPage: page,
