@@ -1,33 +1,17 @@
 <template>
   <div class="container py-5">
-    <AdminRestaurantForm :initial-restaurant="restaurant" @after-submit="handleAfterSubmit"/>
+    <AdminRestaurantForm 
+    :initial-restaurant="restaurant"
+    :is-processing="isProcessing"
+    @after-submit="handleAfterSubmit"/>
   </div>
 </template>
 
 <script>
-const dummyData = {
-  restaurant: {
-    id: 2,
-    name: "Leopoldo White V",
-    tel: "(178) 892-3747 x4993",
-    address: "207 Gunnar Forge",
-    opening_hours: "08:00",
-    description: "omnis velit ut",
-    image:
-      "https://loremflickr.com/320/240/restaurant,food/?random=11.58816530725819",
-    viewCounts: 0,
-    createdAt: "2021-11-10T13:23:38.000Z",
-    updatedAt: "2021-11-10T13:23:38.000Z",
-    CategoryId: 4,
-    Category: {
-      id: 4,
-      name: "墨西哥料理",
-      createdAt: "2021-11-10T13:23:38.000Z",
-      updatedAt: "2021-11-10T13:23:38.000Z",
-    },
-  },
-};
 import AdminRestaurantForm from "./../components/AdminRestaurantForm.vue";
+import adminAPI from './../apis/admin'
+import { Toast } from './../utils/helpers'
+
 export default {
   name: "AdminRestaurantEdit",
   components: {
@@ -45,32 +29,70 @@ export default {
         image: "",
         categoryId: undefined,   
       },
+      isProcessing: false
     };
   },
+  beforeRouteUpdate(to , from , next ) {
+    const { id: restaurantId } = to.params
+    this.fetchRestaurant(restaurantId)
+    next()
+  },
   created() {
-    const { id } = this.$route.params
-    this.fetchRestaurant(id)
+    const { id: restaurantId } = this.$route.params
+    this.fetchRestaurant(restaurantId)
   },
   methods: {
-    fetchRestaurant(restaurantId) {
-      console.log( 'fetchRestaurant id' , restaurantId)
-      const { restaurant } = dummyData
-      const { id , name , tel , address , opening_hours: openingHours , description , image , CategoryId: categoryId } = restaurant
-      this.restaurant = {
-        ...this.restaurant,
-        id,
-        name,
-        tel,
-        address,
-        openingHours,
-        description,
-        image,
-        categoryId,
+    // Ajax拿到資料後會發現adminRestaurantForm沒有資料，因為是非同步的關係。必須去adminRestaurantForm用watch監聽。
+    async fetchRestaurant(restaurantId) {
+      try{
+        const { data } = await adminAPI.restaurants.getDetail(restaurantId)
+        const {
+          id,
+          name,
+          tel,
+          address,
+          opening_hours: openingHours,
+          description,
+          image,
+          CategoryId: categoryId
+        } = data.restaurant
+        this.restaurant = {
+          ...this.restaurant,
+          id,
+          name,
+          tel,
+          address,
+          openingHours,
+          description,
+          image,
+          categoryId
+        }
+      }catch(error) {
+        Toast.fire({
+          icon: 'error',
+          title: '無法取得餐廳資料，請稍後再試'
+        })
       }
     },
-    handleAfterSubmit(formData) {
-      for (let [ key , value ] of formData.entries()){
-        console.log(key , value)
+    async handleAfterSubmit (formData) {
+      try {
+        this.isProcessing = true
+        const { data } = await adminAPI.restaurants.update({
+          restaurantId: this.restaurant.id,
+          formData
+        })
+
+        if (data.status !== 'success') {
+          throw new Error(data.message)
+        }
+
+        this.$router.push({ name: 'admin-restaurants' })
+      } catch (error) {
+        this.isProcessing = false
+        Toast.fire({
+          icon: 'error',
+          title: '無法更新餐廳資料，請稍後再試'
+        })
       }
     }
   }
