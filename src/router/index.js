@@ -1,4 +1,5 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
+import store from './../store'
 import NotFound from '../views/NotFound.vue'
 import SignIn from '../views/SignIn.vue'
 import Restaurants from '../views/Restaurants'
@@ -108,6 +109,12 @@ const router = createRouter({
   history: createWebHashHistory(),
   linkExactActiveClass: 'active',
   routes
+})
+  // 追蹤全域路由變化
+router.beforeEach( ( to , from , next ) => {
+  // 使用 dispatch 呼叫 Vuex 內的 actions
+  store.dispatch( 'fetchCurrentUser')
+  next()
 })
 
 export default router

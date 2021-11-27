@@ -54,43 +54,16 @@
 </template>
 
 <script>
-// seed data
-const dummyUser = {
-  currentUser: {
-    id: 1,
-    name: '管理者',
-    email: 'root@example.com',
-    image: 'https://i.pravatar.cc/300',
-    isAdmin: true
-  },
-  isAuthenticated: true
-}
+// 透過mapState將Vuex store裡的資料取出
+import { mapState } from 'vuex'
+
 
 export default {
-  // Vue 會在沒有資料時使用此預設值
-  data(){
-    return {
-      currentUser: {
-        id: -1,
-        name: '',
-        email: '',
-        image: '',
-        isAdmin: false
-      },
-      isAuthenticated: false
-    }
+computed: {
+    // 透過computed指定取出Vuex store中currentUser及isAuthenticated兩筆資料，就可以在template中被取用
+    // ...解構賦值將mapState還原成computed裡面應有的格式 => currentUser(){} 、 isAuthenticated(){} 
+    ...mapState(['currentUser', 'isAuthenticated'])
   },
-  created(){
-    this.fetchUser()
-  },
-  methods: {
-    fetchUser(){
-      this.currentUser = {
-        ...this.currentUser,
-        ...dummyUser.currentUser
-      }
-      this.isAuthenticated = dummyUser.isAuthenticated
-    }
-  }
+
 }
 </script>

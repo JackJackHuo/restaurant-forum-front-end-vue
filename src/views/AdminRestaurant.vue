@@ -62,6 +62,7 @@ export default {
       },
     };
   },
+  // 追蹤此組件路由變化
   beforeRouteUpdate(to , from , next ) {
     const { id: restaurantId } = to.params
     this.fetchRestaurant(restaurantId)
