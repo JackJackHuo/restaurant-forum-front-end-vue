@@ -1,11 +1,11 @@
 <template>
   <form
-    @submit.stop.prevent="handleSubmit"
+    @submit.stop.prevent="handleSubmit(restaurantId)"
   >
     <div class="form-group mb-4">
       <label for="text">留下評論：</label>
       <textarea
-      v-model="text"
+        v-model="text"
         class="form-control"
         rows="3"
         name="text"
@@ -28,7 +28,9 @@
 </template>
 
 <script>
-import { v4 as uuidv4} from 'uuid'
+// import { v4 as uuidv4} from 'uuid'
+import restaurantsAPI from './../apis/restaurants'
+import { Toast } from './../utils/helpers'
 export default {
     name: 'CreateComment',
     props: {
@@ -43,15 +45,25 @@ export default {
       }
     },
     methods: {
-      handleSubmit () {
-        // TODO: 向 API 發送 POST 請求
-        // 伺服器新增 Comment 成功後...
-        this.$emit('after-create-comment' , {
-          commentId: uuidv4(), // 尚未串接 API 暫時使用隨機的 id
-          text: this.text,
-          restaurantId: this.restaurantId
-        })
-        this.text = '' // 將表單內的資料清空
+      async handleSubmit (restaurantId) {
+        try{
+          // TODO: 向 API 發送 POST 請求
+          const { data } = await restaurantsAPI.comments.create({ restaurantId , text: this.text})
+          if(data.status !== 'success') throw new Error(data.message)
+          // 伺服器新增 Comment 成功後...
+          this.$emit('after-create-comment' , {
+            commentId: data.commentId,
+            text: this.text,
+            restaurantId
+          })
+          this.text = '' // 將表單內的資料清空
+        }catch(error){
+          console.log('error' , error)
+          Toast.fire({
+            icon: 'error',
+            title:'無法新增評論，請稍後再試'
+          })
+        }
       }
     }
 }

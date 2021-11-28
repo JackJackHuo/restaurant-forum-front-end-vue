@@ -1,30 +1,31 @@
 <template>
   <div class="row">
     <div class="col-md-12 mb-3">
-      <h1>Judy Runte</h1>
+      <h1>{{restaurant.name}}</h1>
       <p class="badge badge-secondary mt-1 mb-3">
-        義大利料理
+        {{restaurant.categoryName}}
       </p>
     </div>
     <div class="col-lg-4">
       <img
         class="img-responsive center-block" 
-    src="https://loremflickr.com/320/240/food,dessert,restaurant/"
+        :src="restaurant.image"
         style="width: 250px;margin-bottom: 25px;"
       >
       <div class="contact-info-wrap">
         <ul class="list-unstyled">
           <li>
             <strong>Opening Hour:</strong>
-            08:00
+            {{restaurant.openingHours}}
           </li>
           <li>
             <strong>Tel:</strong>
-            (918) 827-1962
+            {{restaurant.tel}}
+
           </li>
           <li>
             <strong>Address:</strong>
-            98138 Elisa Road
+            {{restaurant.address}}
           </li>
         </ul>
       </div>
@@ -83,6 +84,16 @@ export default {
     initialRestaurant: {
       type: Object,
       required: true
+    }
+  },
+  // 使用非同步方法呼叫 API 時，在拿到後端回應之前，父元件Restaurant就直接把 initialRestaurant 傳給子元件了，因此子元件沒有拿到 API 資料。
+  // 在子元件 RestaurantDetail使用 Vue 的 watch 屬性監控 initialRestaurant 的內容變動，若新的資料傳入，就把資料寫入元件
+  watch: {
+    initialRestaurant(newValue){
+      this.restaurant = {
+        ...this.restaurant,
+        ...newValue
+      }
     }
   },
   data() {

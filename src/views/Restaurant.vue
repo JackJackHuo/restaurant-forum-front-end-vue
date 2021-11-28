@@ -24,102 +24,9 @@
 import RestaurantDetail from './../components/RestaurantDetail.vue'
 import RestaurantComments from './../components/RestaurantComments.vue'
 import CreateComment from './../components/CreateComment.vue'
-
-const dummyData = {
-  restaurant: {
-    id: 1,
-    name: "Maida Hahn",
-    tel: "307.657.6401 x14658",
-    address: "941 Streich Creek",
-    opening_hours: "08:00",
-    description: "Dignissimos a et ut in nostrum.",
-    image:
-      "https://loremflickr.com/320/240/restaurant,food/?random=71.89246751576634",
-    viewCounts: 1,
-    createdAt: "2021-11-10T13:23:38.000Z",
-    updatedAt: "2021-11-13T14:18:40.790Z",
-    CategoryId: 3,
-    Category: {
-      id: 3,
-      name: "義大利料理",
-      createdAt: "2021-11-10T13:23:38.000Z",
-      updatedAt: "2021-11-10T13:23:38.000Z",
-    },
-    FavoritedUsers: [],
-    LikedUsers: [],
-    Comments: [
-      {
-        id: 1,
-        text: "Dicta perspiciatis aperiam eaque dolor.",
-        UserId: 2,
-        RestaurantId: 1,
-        createdAt: "2021-11-10T13:23:38.000Z",
-        updatedAt: "2021-11-10T13:23:38.000Z",
-        User: {
-          id: 2,
-          name: "user1",
-          email: "user1@example.com",
-          password:
-            "$2a$10$.xT1dM.Jz2g6sq8S7ciN7.S9ktX7nF3HA8Y/IlgE7AaScnWthqxrW",
-          isAdmin: false,
-          image: null,
-          createdAt: "2021-11-10T13:23:38.000Z",
-          updatedAt: "2021-11-10T13:23:38.000Z",
-        },
-      },
-      {
-        id: 51,
-        text: "Amet rerum dolores tempora quas.",
-        UserId: 2,
-        RestaurantId: 1,
-        createdAt: "2021-11-10T13:23:38.000Z",
-        updatedAt: "2021-11-10T13:23:38.000Z",
-        User: {
-          id: 2,
-          name: "user1",
-          email: "user1@example.com",
-          password:
-            "$2a$10$.xT1dM.Jz2g6sq8S7ciN7.S9ktX7nF3HA8Y/IlgE7AaScnWthqxrW",
-          isAdmin: false,
-          image: null,
-          createdAt: "2021-11-10T13:23:38.000Z",
-          updatedAt: "2021-11-10T13:23:38.000Z",
-        },
-      },
-      {
-        id: 101,
-        text: "Ea quis consectetur.",
-        UserId: 2,
-        RestaurantId: 1,
-        createdAt: "2021-11-10T13:23:38.000Z",
-        updatedAt: "2021-11-10T13:23:38.000Z",
-        User: {
-          id: 2,
-          name: "user1",
-          email: "user1@example.com",
-          password:
-            "$2a$10$.xT1dM.Jz2g6sq8S7ciN7.S9ktX7nF3HA8Y/IlgE7AaScnWthqxrW",
-          isAdmin: false,
-          image: null,
-          createdAt: "2021-11-10T13:23:38.000Z",
-          updatedAt: "2021-11-10T13:23:38.000Z",
-        },
-      },
-    ],
-  },
-  isFavorited: false,
-  isLiked: false,
-};
-const dummyUser = {
-  currentUser:{
-    "id": 1,
-    "name": "root",
-    "email": "root@example.com",
-    "image": null,
-    "isAdmin": true
-  },
-  isAuthenticated: true
-}
+import restaurantsAPI from './../apis/restaurants'
+import  { Toast } from './../utils/helpers'
+import { mapState } from 'vuex'
 
 export default {
   components: {
@@ -142,43 +49,60 @@ export default {
         isLiked: false,
       },
       restaurantComments: [],
-      currentUser:dummyUser.currentUser
     };
+  },
+  // 如果使用者直接在瀏覽器上輸入網址，就不會觸發 created ，也不會向後端發送新的請求。
+  // 透過 Vue router 的 beforeRouteUpdate 方法監聽路由事件
+  beforeRouteUpdate( to , from , next ) {
+    const { id } = to.params
+    this.fetchRestaurant(id)
+    next()
+  },
+  computed: {
+    ...mapState(['currentUser'])
   },
   created() {
     const { id: restaurantId } = this.$route.params
     this.fetchRestaurant(restaurantId)
   },
   methods: {
-    fetchRestaurant(restaurantId) {
-      console.log('fetchRestaurant id: ', restaurantId)
-      const { restaurant, isFavorited, isLiked } = dummyData;
-      const {
-        id,
-        name,
-        tel,
-        address,
-        opening_hours: openingHours,
-        description,
-        image,
-        Category,
-        Comments
-      } = restaurant;
+    async fetchRestaurant(restaurantId) {
+      try {
+        const { data } = await restaurantsAPI.getRestaurant( {restaurantId} )
+        const { restaurant, isFavorited, isLiked } = data;
+        const {
+          id,
+          name,
+          tel,
+          address,
+          opening_hours: openingHours,
+          description,
+          image,
+          Category,
+          Comments
+        } = restaurant;
 
-      this.restaurant = {
-        id,
-        name,
-        categoryName: Category? Category.name : '未分類',
-        image,
-        openingHours,
-        tel,
-        address,
-        description,
-        isFavorited,
-        isLiked,
-      };
+        this.restaurant = {
+          id,
+          name,
+          categoryName: Category? Category.name : '未分類',
+          image,
+          openingHours,
+          tel,
+          address,
+          description,
+          isFavorited,
+          isLiked,
+        };
 
-      this.restaurantComments = Comments
+        this.restaurantComments = Comments
+      }catch(error){
+        console.log(error)
+        Toast.fire({
+          icon: 'error',
+          title: '無法取得餐廳資料，請稍後再試'
+        })
+      }
     },
     afterDeleteComment(commentId){
       // commentId從子層RestaurantComments傳來
