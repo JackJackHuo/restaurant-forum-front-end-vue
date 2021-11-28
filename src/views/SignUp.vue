@@ -119,6 +119,7 @@ export default {
           icon: 'success',
           title: '成功註冊!'
         })
+        this.$router.push('/signin')
       }catch(error) {
         Toast.fire({
           icon: 'error',
