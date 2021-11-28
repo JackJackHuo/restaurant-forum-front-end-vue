@@ -55,7 +55,6 @@ export default {
       try{
         // TODO: 請求 API 伺服器刪除 id 為 commentId 的評論
         const { data } = await restaurantsAPI.comments.delete({ commentId }) 
-        console.log(data)
         if( data.status !== 'success') throw new Error(data.message)
         // 觸發父層事件 - $emit( '事件名稱' , 傳遞的資料 )
         this.$emit('after-delete-comment', commentId)

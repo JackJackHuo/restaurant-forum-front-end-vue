@@ -26,83 +26,8 @@
 
 
 <script>
-const dummyData = {
-    "restaurant": {
-        "id": 1,
-        "name": "Maida Hahn",
-        "tel": "307.657.6401 x14658",
-        "address": "941 Streich Creek",
-        "opening_hours": "08:00",
-        "description": "Dignissimos a et ut in nostrum.",
-        "image": "https://loremflickr.com/320/240/restaurant,food/?random=71.89246751576634",
-        "viewCounts": 1,
-        "createdAt": "2021-11-10T13:23:38.000Z",
-        "updatedAt": "2021-11-13T14:18:40.000Z",
-        "CategoryId": 3,
-        "Category": {
-            "id": 3,
-            "name": "義大利料理",
-            "createdAt": "2021-11-10T13:23:38.000Z",
-            "updatedAt": "2021-11-10T13:23:38.000Z"
-        },
-        "Comments": [
-            {
-                "id": 1,
-                "text": "Dicta perspiciatis aperiam eaque dolor.",
-                "UserId": 2,
-                "RestaurantId": 1,
-                "createdAt": "2021-11-10T13:23:38.000Z",
-                "updatedAt": "2021-11-10T13:23:38.000Z",
-                "User": {
-                    "id": 2,
-                    "name": "user1",
-                    "email": "user1@example.com",
-                    "password": "$2a$10$.xT1dM.Jz2g6sq8S7ciN7.S9ktX7nF3HA8Y/IlgE7AaScnWthqxrW",
-                    "isAdmin": false,
-                    "image": null,
-                    "createdAt": "2021-11-10T13:23:38.000Z",
-                    "updatedAt": "2021-11-10T13:23:38.000Z"
-                }
-            },
-            {
-                "id": 51,
-                "text": "Amet rerum dolores tempora quas.",
-                "UserId": 2,
-                "RestaurantId": 1,
-                "createdAt": "2021-11-10T13:23:38.000Z",
-                "updatedAt": "2021-11-10T13:23:38.000Z",
-                "User": {
-                    "id": 2,
-                    "name": "user1",
-                    "email": "user1@example.com",
-                    "password": "$2a$10$.xT1dM.Jz2g6sq8S7ciN7.S9ktX7nF3HA8Y/IlgE7AaScnWthqxrW",
-                    "isAdmin": false,
-                    "image": null,
-                    "createdAt": "2021-11-10T13:23:38.000Z",
-                    "updatedAt": "2021-11-10T13:23:38.000Z"
-                }
-            },
-            {
-                "id": 101,
-                "text": "Ea quis consectetur.",
-                "UserId": 2,
-                "RestaurantId": 1,
-                "createdAt": "2021-11-10T13:23:38.000Z",
-                "updatedAt": "2021-11-10T13:23:38.000Z",
-                "User": {
-                    "id": 2,
-                    "name": "user1",
-                    "email": "user1@example.com",
-                    "password": "$2a$10$.xT1dM.Jz2g6sq8S7ciN7.S9ktX7nF3HA8Y/IlgE7AaScnWthqxrW",
-                    "isAdmin": false,
-                    "image": null,
-                    "createdAt": "2021-11-10T13:23:38.000Z",
-                    "updatedAt": "2021-11-10T13:23:38.000Z"
-                }
-            }
-        ]
-    }
-}
+import restaurantsAPI from './../apis/restaurants'
+import { Toast } from "./../utils/helpers";
 export default {
   name: 'RestaurantDashboard',
   data () {
@@ -118,22 +43,31 @@ export default {
     }
   },
   created () {
-    const { id: restaurantId } = this.$route.params
-    this.fetchRestaurantDashoard(restaurantId)
+    const { id } = this.$route.params
+    this.fetchRestaurantDashoard(id)
   },
   methods: {
-    fetchRestaurantDashoard(restaurantId) {
-      console.log('fetchRestaurantDashoard id: ', restaurantId)
-      // 此name為restaurant的name
-      const { id , name , viewCounts , Category , Comments} = dummyData.restaurant
-      // 此name為Category裡面的name，將Category裡面的name在解構賦值時重新取名成data內的名稱categoryName
-      const { name: categoryName } = Category
-      this.restaurant = {
-        id,
-        name,
-        categoryName: Category ? categoryName : '未分類',
-        commentsLength: Comments.length,
-        viewCounts
+    async fetchRestaurantDashoard(restaurantId) {
+      try{
+        const { data } = await restaurantsAPI.getRestaurant({ restaurantId })
+        if(!data) throw new Error('error') 
+        // 此name為restaurant的name
+        const { id , name , viewCounts , Category , Comments} = data.restaurant
+        // 此name為Category裡面的name，將Category裡面的name在解構賦值時重新取名成data內的名稱categoryName
+        const { name: categoryName } = Category
+        this.restaurant = {
+          id,
+          name,
+          categoryName: Category ? categoryName : '未分類',
+          commentsLength: Comments.length,
+          viewCounts
+        }
+      }catch(error){
+        console.log('error',error)
+        Toast.fire({
+          icon: 'error',
+          title: "無法取得餐廳資料，請稍後再試",
+        })
       }
     }
   }

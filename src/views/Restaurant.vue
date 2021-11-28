@@ -36,8 +36,9 @@ export default {
   },
   data() {
     return {
+      // 這裡如果id設成undefined的話會出現warning，因為在子元件RestaurantDetail接收initialRestaurant時，props設定是required，所以必須給值，不能設定undefined。
       restaurant: {
-        id: undefined,
+        id: -1,
         name: "",
         categoryName: "",
         image: "",
