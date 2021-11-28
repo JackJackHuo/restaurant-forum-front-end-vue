@@ -15,7 +15,7 @@
           :to="{ name: 'user' , params: { id: user.id }}"
         >
           <img
-            :src="user.image"
+            :src="emptyImage(user.image)"
           >
         </router-link>
         <h2>{{user.name}}</h2>
@@ -48,8 +48,11 @@
 import NavTabs from './../components/NavTabs.vue'
 import userAPI from './../apis/user'
 import { Toast } from './../utils/helpers'
+import {emptyImageFilter} from './../utils/mixins'
 
 export default {
+  name: 'UserTop',
+  mixins:[emptyImageFilter],
   components:{
     NavTabs
   },

@@ -44,6 +44,7 @@
           <button
             type="button"
             class="btn btn-sm btn-outline-success my-2 my-sm-0"
+            @click="logout"
           >
             登出
           </button>
@@ -64,6 +65,12 @@ computed: {
     // ...解構賦值將mapState還原成computed裡面應有的格式 => currentUser(){} 、 isAuthenticated(){} 
     ...mapState(['currentUser', 'isAuthenticated'])
   },
+  methods:{
+    logout(){
+      this.$store.commit('revokeAuthentication')
+      this.$router.push('/signin')
+    }
+  }
 
 }
 </script>

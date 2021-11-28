@@ -4,7 +4,15 @@ import NotFound from '../views/NotFound.vue'
 import SignIn from '../views/SignIn.vue'
 import Restaurants from '../views/Restaurants'
 
+const authorizeIsAdmin = (to, from, next) => {
+  const currentUser = store.state.currentUser
+  if (currentUser && !currentUser.isAdmin) {
+    next('/:pathMatch(.*)*')
+    return
+  }
 
+  next()
+}
 const routes = [
   {
     path: '/',
@@ -65,38 +73,44 @@ const routes = [
   {
     path:'/admin',
     exact: true,
-    redirect: '/admin/restaurants'
+    redirect: '/admin/restaurants',
   },
   {
     path: '/admin/restaurants',
     name: 'admin-restaurants',
-    component: () => import('../views/AdminRestaurants.vue')
+    component: () => import('../views/AdminRestaurants.vue'),
+    beforeEnter: authorizeIsAdmin
   },
   {
     path: '/admin/restaurants/new',
     name: 'admin-restaurant-new',
-    component: () => import('../views/AdminRestaurantNew.vue')
+    component: () => import('../views/AdminRestaurantNew.vue'),
+    beforeEnter: authorizeIsAdmin
   },
   // param路由:id要放在後面，否則會攔截前面/admin/restaurants/..路由
   {
     path: '/admin/restaurants/:id/edit',
     name: 'admin-restaurant-edit',
-    component: () => import('../views/AdminRestaurantEdit')
+    component: () => import('../views/AdminRestaurantEdit'),
+    beforeEnter: authorizeIsAdmin
   },
   {
     path: '/admin/restaurants/:id',
     name: 'admin-restaurant',
-    component: () => import('../views/AdminRestaurant.vue')
+    component: () => import('../views/AdminRestaurant.vue'),
+    beforeEnter: authorizeIsAdmin
   },
   {
     path: '/admin/categories',
     name: 'admin-categories',
-    component: () => import('../views/AdminCategories.vue')
+    component: () => import('../views/AdminCategories.vue'),
+    beforeEnter: authorizeIsAdmin
   },
   {
     path:'/admin/users',
     name: 'admin-users',
-    component: () => import('./../views/AdminUsers')
+    component: () => import('./../views/AdminUsers'),
+    beforeEnter: authorizeIsAdmin
   },
   {
     path: '/:pathMatch(.*)*',
@@ -111,9 +125,29 @@ const router = createRouter({
   routes
 })
   // 追蹤全域路由變化
-router.beforeEach( ( to , from , next ) => {
-  // 使用 dispatch 呼叫 Vuex 內的 actions
-  store.dispatch( 'fetchCurrentUser')
+router.beforeEach( async ( to , from , next ) => {
+  // 從 localStorage 取出 token
+  const tokenInLocalStorage  = localStorage.getItem('token')
+  const tokenInStore = store.state.token
+  // 預設是尚未驗證
+  let isAuthenticated = store.state.isAuthenticated
+  // 對於不需要驗證 token 的頁面
+  const pathsWithoutAuthentication = ['sign-up', 'sign-in']
+  // 比較 localStorage 和 store 中的 token 是否一樣
+  if (tokenInLocalStorage && tokenInLocalStorage !== tokenInStore){
+    // 使用 dispatch 呼叫 Vuex 內的 actions
+    isAuthenticated = await store.dispatch( 'fetchCurrentUser')
+  }
+  // 如果 token 無效且進入需要驗證的頁面則轉址到登入頁
+  if (!isAuthenticated && !pathsWithoutAuthentication.includes(to.name)){
+    next('/signin')
+    return
+  }
+  // 如果 token 有效且進入不需要驗證的頁面則轉址到餐廳首頁
+  if (isAuthenticated && pathsWithoutAuthentication.includes(to.name)){
+    next('/restaurants')
+    return 
+  }
   next()
 })
 
