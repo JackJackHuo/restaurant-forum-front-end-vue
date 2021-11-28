@@ -9,7 +9,7 @@ export default createStore({
       name: '',
       email: '',
       image: '',
-      isAdmin: false
+      isAdmin: ''
     },
     isAuthenticated: false
   },

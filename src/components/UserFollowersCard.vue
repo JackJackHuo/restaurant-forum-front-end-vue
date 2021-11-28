@@ -5,7 +5,7 @@
       <router-link 
         v-for="follower in followers"
         :key="follower.id"
-        :to="{ name: 'user' , query: { userId: follower.id }}"
+        :to="{ name: 'user' , query: { id: follower.id }}"
       >
         <img
           :src="follower.image"
@@ -24,7 +24,7 @@ export default {
   props: {
     followers: {
       type: Array,
-      required: true
+      default: () => []
     }
   },
 }

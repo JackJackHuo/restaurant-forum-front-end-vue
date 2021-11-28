@@ -16,6 +16,11 @@ export default {
       }
     })
   },
+  update({ userId, formData }) {
+    return apiHelper.put(`/users/${userId}`, formData, {
+      headers: { Authorization: `Bearer ${getToken()}` }
+    })
+  },
   addFavorite(restaurantId) {
     // axios post 的參數為(url , data , config)，若沒有data往後端拋須填null
    return apiHelper.post(`/favorite/${restaurantId}` , null , {

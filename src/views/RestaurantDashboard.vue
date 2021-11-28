@@ -50,7 +50,7 @@ export default {
     async fetchRestaurantDashoard(restaurantId) {
       try{
         const { data } = await restaurantsAPI.getRestaurant({ restaurantId })
-        if(!data) throw new Error('error') 
+        if(!data) throw new Error('無法取得餐廳資料') 
         // 此name為restaurant的name
         const { id , name , viewCounts , Category , Comments} = data.restaurant
         // 此name為Category裡面的name，將Category裡面的name在解構賦值時重新取名成data內的名稱categoryName
