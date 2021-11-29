@@ -1,6 +1,7 @@
 <template>
+  <Spinner v-if="isLoading" />
   <form 
-    v-show="!isLoading"
+    v-else
     @submit.stop.prevent="handleSubmit"
   >
     <div class="form-group">
@@ -113,9 +114,13 @@
 
 <script>
 import adminAPI from './../apis/admin'
+import Spinner from './Spinner.vue'
 import { Toast } from './../utils/helpers'
 export default {
   name: "AdminRestaurantForm",
+  components:{
+    Spinner
+  },
   props: {
     initialRestaurant: {
       type: Object,
@@ -171,6 +176,7 @@ export default {
   methods: {
     async fetchCategories() {
       try{
+        this.isLoading = true
         const { data } = await adminAPI.categories.get()
         this.categories = data.categories;
         this.isLoading = false

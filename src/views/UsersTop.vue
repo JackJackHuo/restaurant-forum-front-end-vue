@@ -1,51 +1,55 @@
 <template>
   <div class="container py-5">
     <NavTabs />
-    <h1 class="mt-5">
-      美食達人
-    </h1>
-    <hr>
-    <div class="row text-center">
-      <div 
-        v-for="user in users"
-        :key="user.id"
-        class="col-3"
-      >
-        <router-link 
-          :to="{ name: 'user' , params: { id: user.id }}"
+    <Spinner v-if="isLoading" />
+    <template v-else>      
+      <h1 class="mt-5">
+        美食達人
+      </h1>
+      <hr>
+      <div class="row text-center">
+        <div 
+          v-for="user in users"
+          :key="user.id"
+          class="col-3"
         >
-          <img
-            :src="emptyImage(user.image)"
+          <router-link 
+            :to="{ name: 'user' , params: { id: user.id }}"
           >
-        </router-link>
-        <h2>{{user.name}}</h2>
-        <span class="badge badge-secondary">追蹤人數：{{user.followerCount}}</span>
-        <p class="mt-3">
-          <button
-            v-if="user.isFollowed"
-            type="button"
-            class="btn btn-danger"
-            @click.stop.prevent="unfollow(user.id)"
-          >
-            取消追蹤
-          </button>
-          <button
-            v-else
-            type="button"
-            class="btn btn-primary"
-            @click.stop.prevent="follow(user.id)"
-          >
-            追蹤
-          </button>
-        </p>
+            <img
+              :src="emptyImage(user.image)"
+            >
+          </router-link>
+          <h2>{{user.name}}</h2>
+          <span class="badge badge-secondary">追蹤人數：{{user.followerCount}}</span>
+          <p class="mt-3">
+            <button
+              v-if="user.isFollowed"
+              type="button"
+              class="btn btn-danger"
+              @click.stop.prevent="unfollow(user.id)"
+            >
+              取消追蹤
+            </button>
+            <button
+              v-else
+              type="button"
+              class="btn btn-primary"
+              @click.stop.prevent="follow(user.id)"
+            >
+              追蹤
+            </button>
+          </p>
+        </div>
       </div>
-    </div>
+    </template>
   </div>
 </template>
 
 <script>
 
 import NavTabs from './../components/NavTabs.vue'
+import Spinner from './../components/Spinner.vue'
 import userAPI from './../apis/user'
 import { Toast } from './../utils/helpers'
 import {emptyImageFilter} from './../utils/mixins'
@@ -54,11 +58,13 @@ export default {
   name: 'UserTop',
   mixins:[emptyImageFilter],
   components:{
-    NavTabs
+    NavTabs,
+    Spinner
   },
   data() {
     return {
-      users: []
+      users: [],
+      isLoading:true
     }
   },
   created() {
@@ -66,6 +72,7 @@ export default {
   },
   methods: {
     async fetchUsers() {
+      this.isLoading = true
       try{
         const { data } = await userAPI.getTopUsers()
         this.users = data.users.map(user => ({
@@ -75,7 +82,9 @@ export default {
           followerCount: user.FollowerCount,
           isFollowed: user.isFollowed
         }))
+        this.isLoading = false
       }catch(error){
+        this.isLoading = false
         Toast.fire({
           icon: 'error',
           title: '無法取得美食達人資料，請稍後再試'

@@ -1,22 +1,24 @@
 <template>
   <div class="container py-5">
-    <h1>餐廳描述頁</h1>
-    <!-- 餐廳資訊頁 RestaurantDetail -->
-    <RestaurantDetail
-      :initial-restaurant="restaurant"
-    />
-    <hr />
-    <!-- 餐廳評論 RestaurantComments -->
-    <RestaurantComments
-      :restaurant-comments="restaurantComments"
-      @after-delete-comment="afterDeleteComment"
-    />
-    <!-- 新增評論 CreateComment -->
-    <CreateComment 
-      :restaurant-id="restaurant.id"
-      @after-create-comment="afterCreateComment"
+    <Spinner v-if="isLoading" />
+    <template v-else>
+      <!-- 餐廳資訊頁 RestaurantDetail -->
+      <RestaurantDetail
+        :initial-restaurant="restaurant"
+      />
+      <hr />
+      <!-- 餐廳評論 RestaurantComments -->
+      <RestaurantComments
+        :restaurant-comments="restaurantComments"
+        @after-delete-comment="afterDeleteComment"
+      />
+      <!-- 新增評論 CreateComment -->
+      <CreateComment 
+        :restaurant-id="restaurant.id"
+        @after-create-comment="afterCreateComment"
 
-    />
+      />
+    </template>
   </div>
 </template>
 
@@ -24,6 +26,7 @@
 import RestaurantDetail from './../components/RestaurantDetail.vue'
 import RestaurantComments from './../components/RestaurantComments.vue'
 import CreateComment from './../components/CreateComment.vue'
+import Spinner from './../components/Spinner.vue'
 import restaurantsAPI from './../apis/restaurants'
 import  { Toast } from './../utils/helpers'
 import { mapState } from 'vuex'
@@ -32,7 +35,8 @@ export default {
   components: {
     RestaurantDetail,
     RestaurantComments,
-    CreateComment
+    CreateComment,
+    Spinner
   },
   data() {
     return {
@@ -50,6 +54,7 @@ export default {
         isLiked: false,
       },
       restaurantComments: [],
+      isLoading: true
     };
   },
   // 如果使用者直接在瀏覽器上輸入網址，就不會觸發 created ，也不會向後端發送新的請求。
@@ -68,6 +73,7 @@ export default {
   },
   methods: {
     async fetchRestaurant(restaurantId) {
+      this.isLoading = true
       try {
         const { data } = await restaurantsAPI.getRestaurant( {restaurantId} )
         const { restaurant, isFavorited, isLiked } = data;
@@ -97,7 +103,9 @@ export default {
         };
 
         this.restaurantComments = Comments
+        this.isLoading = false
       }catch(error){
+        this.isLoading = false
         console.log(error)
         Toast.fire({
           icon: 'error',
